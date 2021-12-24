@@ -1,0 +1,25 @@
+{
+  "name": "@easy-payment/idbank",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InstigateMobile/easy-payment-idbank"
+  },
+  "keywords": [
+    "payment",
+    "gateway",
+    "easy-payment",
+    "idbank"
+  ],
+  "author": "Instigate Mobile CJCS",
+  "license": "MIT",
+  "dependencies": {
+    "@easy-payment/base": "git+https://github.com/InstigateMobile/easy-payment-base.git",
+    "got": "^11.8.3"
+  }
+}
