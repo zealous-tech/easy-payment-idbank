@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "exit 0"
+    "test": "tap test/*.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,9 @@
   "dependencies": {
     "@easy-payment/base": "git+https://github.com/InstigateMobile/easy-payment-base.git",
     "got": "^11.8.3"
+  },
+  "devDependencies": {
+    "easy-payment": "git+https://github.com/InstigateMobile/easy-payment-main.git",
+    "tap": "^15.1.6"
   }
 }
