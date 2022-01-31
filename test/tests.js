@@ -260,7 +260,7 @@ const getOrderStatusTest = async (Gateways,IDBANK,tap) => {
                 extended: true,
             });
 
-            const comparableOrder = {
+            const comparableStatus = {
                 hasError: CONSTANTS.GET_ORDER_STATUS_SUCCESS.hasError,
                 data: {
                     ...res.data,
@@ -272,7 +272,7 @@ const getOrderStatusTest = async (Gateways,IDBANK,tap) => {
             }
             
             tap.plan(1);
-            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.strictSame(res, comparableStatus, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
             tap.end();
         });
     });
