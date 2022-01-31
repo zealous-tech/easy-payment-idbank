@@ -1,7 +1,7 @@
 const CONSTANTS = require('./constants/constants')
 
 const attachCardTest = (Gateways,IDBANK,tap,makeId) => {
-    tap.test('Attach card', async (tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.ATTACH_CARD, async (tap) => {
         const settings = {
             USER_NAME_API: '14531737_api',
             PASSWORD_API: 'ker1Vanadzor1pak1',
@@ -25,72 +25,74 @@ const attachCardTest = (Gateways,IDBANK,tap,makeId) => {
             clientId: clientId,
         }
     
-        tap.test('Testing without settings fields', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.SETTINGS_FIELDS, async (tap) => {
             const newSettings = {...settings};
-            newSettings.PASSWORD_API = null;
+            delete newSettings.PASSWORD_API;
             try {
-                const client = Gateways.create(IDBANK, newSettings);
+                Gateways.create(IDBANK, newSettings);
             } catch(err) {
                 tap.plan(2);
-                tap.equal(err.name, CONSTANTS.SETTINGS.NAME, 'Error name is equal');
-                tap.ok(CONSTANTS.SETTINGS.MESSAGE.includes(err.message), 'Error message is equal');
+                tap.equal(err.name, CONSTANTS.SETTINGS.NAME, CONSTANTS.MESSAGES.ERROR_NAME_EQUAL);
+                tap.ok(CONSTANTS.SETTINGS.MESSAGE.includes(err.message), CONSTANTS.MESSAGES.ERROR_MESSAGE_EQUAL);
             }
             tap.end();
         });
     
-        tap.test('Testing timeout', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.TIMEOUT, async (tap) => {
             const newSettings = {...settings, TIMEOUT: 10};
             const client = Gateways.create(IDBANK, newSettings);
             const order = { ...defaultOrder };
             const res = await client.attachCard(order);
     
             tap.plan(2);
-            tap.ok(res.hasError, 'Error is a true');
-            tap.equal(res.err.name, CONSTANTS.ATTACH_CARD.TIMEOUT.MESSAGE, 'Error message is equal');
+            tap.ok(res.hasError, CONSTANTS.MESSAGES.HAS_ERROR_EQUAL);
+            tap.equal(res.err.name, CONSTANTS.TIMEOUT.MESSAGE, CONSTANTS.MESSAGES.ERROR_MESSAGE_EQUAL);
             tap.end();
         });
     
-        tap.test('Testing without amount', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             order.amount = null;
             const res = await client.attachCard(order);
     
             tap.plan(1);
-            tap.strictSame(res, CONSTANTS.ATTACH_CARD.AMOUNT_INVALID, 'The response a equivalent strictly')
+            tap.strictSame(res, CONSTANTS.AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
             tap.end();
         });
     
-        tap.test('Testing without orderId', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_NUMBER, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             order.orderNumber = null;
             const res = await client.attachCard(order);
     
             tap.plan(1);
-            tap.strictSame(res, CONSTANTS.ATTACH_CARD.ORDER_NUMBER, 'The response a equivalent strictly')
+            tap.strictSame(res, CONSTANTS.ORDER_NUMBER, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
             tap.end();
         });
     
-        tap.test('Testing without language', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.LANGUAGE, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             order.language = null;
             const res = await client.attachCard(order);
 
             tap.plan(1);
-            tap.strictSame(res,CONSTANTS.ATTACH_CARD.LANGUAGE_INVALID,'The response a equivalent strictly')
+            tap.strictSame(res,CONSTANTS.LANGUAGE_INVALID,CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
             tap.end();
         });
-    
-        tap.test('Success',async (tap) => {
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS,async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             const res = await client.attachCard(order);
     
-            tap.plan(2);
-            tap.notOk(res.hasError, 'Has Error is equal');
-            tap.equal(res.data.errorCode, CONSTANTS.ATTACH_CARD.SUCCESS.ERROR_CODE, 'Error code is equal');
+            tap.plan(4);
+            tap.notOk(res.hasError, CONSTANTS.MESSAGES.HAS_ERROR_EQUAL);
+            tap.notOk(res.data.error, CONSTANTS.MESSAGES.ERROR_EQUAL);
+            tap.equal(res.data.errorCode, CONSTANTS.SUCCESS.ERROR_CODE, CONSTANTS.MESSAGES.ERROR_CODE_EQUAL);
+            tap.equal(res.data.errorCodeString, CONSTANTS.SUCCESS.ERROR_CODE_STRING, CONSTANTS.MESSAGES.ERROR_CODE_EQUAL);
             tap.end();
         })
     
@@ -99,7 +101,7 @@ const attachCardTest = (Gateways,IDBANK,tap,makeId) => {
 }
 
 const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
-    tap.test('Pay order', async (tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.PAY_ORDER, async (tap) => {
         const settings = {
             USER_NAME_API: '14531661_api',
             PASSWORD_API: 'ker1Vanadzor1pak',
@@ -125,31 +127,94 @@ const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
             useBinding: true,
         }
     
-        tap.test('Testing without settings fields', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.SETTINGS_FIELDS, async (tap) => {
             const newSettings = {...settings};
-            newSettings.USER_NAME_API = 'asdasd';
+            delete newSettings.USER_NAME_API;
             try {
-                const client = Gateways.create(IDBANK, newSettings);
+                Gateways.create(IDBANK, newSettings);
             } catch(err) {
                 tap.plan(2);
-                tap.equal(err.name, CONSTANTS.SETTINGS.NAME, 'Error name is equal');
-                tap.ok(CONSTANTS.SETTINGS.MESSAGE.includes(err.message), 'Error message is equal');
+                tap.equal(err.name, CONSTANTS.SETTINGS.NAME, CONSTANTS.MESSAGES.ERROR_NAME_EQUAL);
+                tap.ok(CONSTANTS.SETTINGS.MESSAGE.includes(err.message), CONSTANTS.MESSAGES.ERROR_MESSAGE_EQUAL);
             }
             tap.end();
         });
     
-        tap.test('Testing timeout', async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.TIMEOUT, async (tap) => {
             const newSettings = {...settings, TIMEOUT: 10};
             const client = Gateways.create(IDBANK, newSettings);
-            const res = await client.payOrder(defaultOrder);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const res = await client.payOrder(order);
 
             tap.plan(2);
-            tap.ok(res.hasError, 'Error is a true');
-            tap.equal(res.err.name, CONSTANTS.PAY_ORDER.TIMEOUT.MESSAGE, 'Error message is equal');
+            tap.ok(res.hasError, CONSTANTS.MESSAGES.ERROR_EQUAL);
+            tap.equal(res.err.name, CONSTANTS.TIMEOUT.MESSAGE, CONSTANTS.MESSAGES.ERROR_MESSAGE_EQUAL);
             tap.end();
         });
 
-        tap.test('Success',async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            order.amount = null;
+            const res = await client.payOrder(order);
+    
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.end();
+        });
+    
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_NUMBER, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = null;
+            const res = await client.payOrder(order);
+    
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.ORDER_NUMBER, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.end();
+        });
+    
+        tap.test(CONSTANTS.TEST_NAMES.LANGUAGE, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            order.language = null;
+            const res = await client.payOrder(order);
+
+            tap.plan(1);
+            tap.strictSame(res,CONSTANTS.LANGUAGE_INVALID,CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.CLIENT_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            delete order.clientId;
+            const res = await client.payOrder(order);
+            delete res.register;
+            
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.PAY_ORDER_NO_BINDING_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.BINDING_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            delete order.bindingId;
+            const res = await client.payOrder(order);
+            delete res.register;
+
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.PAY_ORDER_NO_BINDING_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS,async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             const {hasError,data} = await client.payOrder(order);
@@ -158,10 +223,10 @@ const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
             }
 
             const comparableOrder = {
-                hasError: CONSTANTS.PAY_ORDER.SUCCESS.hasError,
+                hasError: CONSTANTS.PAY_ORDER_SUCCESS.hasError,
                 data: {
                     ...data,
-                    ...CONSTANTS.PAY_ORDER.SUCCESS.data,
+                    ...CONSTANTS.PAY_ORDER_SUCCESS.data,
                     orderNumber: order.orderNumber,
                     amount:  order.amount,
                     depositAmount:  order.amount,
@@ -172,9 +237,9 @@ const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
             }
 
             tap.plan(1);
-            tap.strictSame(res, comparableOrder, 'Response is equal');
+            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
             tap.end();
-        })
+        });
     
         tap.end();
     });
