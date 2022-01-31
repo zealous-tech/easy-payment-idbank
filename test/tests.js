@@ -155,7 +155,7 @@ const payOrderTest = async (Gateways,IDBANK,tap) => {
         tap.test(CONSTANTS.TEST_NAMES.ORDER_NUMBER, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
-            order.orderNumber = null;
+            delete order.orderNumber;
             const res = await client.payOrder(order);
     
             tap.plan(1);
@@ -167,7 +167,7 @@ const payOrderTest = async (Gateways,IDBANK,tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             order.orderNumber = `tl${makeId(10)}`;
-            order.language = null;
+            delete order.language;
             const res = await client.payOrder(order);
 
             tap.plan(1);
@@ -278,4 +278,108 @@ const getOrderStatusTest = async (Gateways,IDBANK,tap) => {
     });
 }
 
-module.exports = { attachCardTest, payOrderTest, getOrderStatusTest };
+const freezeTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.FREEZE, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.TIMEOUT, async (tap) => {
+            const newSettings = {...settings, TIMEOUT: 10};
+            const client = Gateways.create(IDBANK, newSettings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const res = await client.freezeOrder(order);
+
+            tap.plan(2);
+            tap.ok(res.hasError, CONSTANTS.MESSAGES.ERROR_EQUAL);
+            tap.equal(res.err.name, CONSTANTS.TIMEOUT.MESSAGE, CONSTANTS.MESSAGES.ERROR_MESSAGE_EQUAL);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            delete order.amount;
+            const res = await client.freezeOrder(order);
+            
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.FREEZE_AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_NUMBER, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            delete order.orderNumber;
+            const res = await client.freezeOrder(order);
+    
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.FREEZE_ORDER_NUMBER, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.LANGUAGE, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            delete order.language;
+            const res = await client.freezeOrder(order);
+
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.FREEZE_LANGUAGE, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.CLIENT_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            delete order.clientId;
+            const res = await client.freezeOrder(order);
+            delete res.registerPreAuth;
+            
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.FREEZE_NO_BINDING_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.BINDING_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            delete order.bindingId;
+            const res = await client.freezeOrder(order);
+            delete res.registerPreAuth;
+
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.FREEZE_NO_BINDING_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const res = await client.freezeOrder(order);
+            delete res.registerPreAuth;
+            delete res.paymentOrderBinding;
+
+            const comparableOrder = {
+                hasError: CONSTANTS.FREEZE_SUCCESS.hasError,
+                data: {
+                    ...res.data,
+                    ...CONSTANTS.FREEZE_SUCCESS.data,
+                    orderNumber: order.orderNumber,
+                    amount:  order.amount,
+                    currency:  order.currency,
+                    clientId:  order.clientId,
+                    bindingId:  order.bindingId,
+                },
+            }
+            
+            tap.plan(1);
+            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+    });
+}
+
+module.exports = { attachCardTest, payOrderTest, getOrderStatusTest, freezeTest };

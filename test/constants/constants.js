@@ -12,6 +12,7 @@ const ERRORS = {
         CLIENT_ID: 'Testing without clientId',
         BINDING_ID: 'Testing without bindingId',
         GET_ORDER_STATUS: 'Get order status',
+        FREEZE: 'Freeze'
     },
     MESSAGES: {
         EQUIVALENT_STRICTLY: 'The response a equivalent strictly',
@@ -19,7 +20,8 @@ const ERRORS = {
         ERROR_NAME_EQUAL: 'Error name is equal',
         ERROR_CODE_EQUAL: 'Error code is equal',
         ERROR_EQUAL: 'Error is equal',
-        HAS_ERROR_EQUAL: 'Has error is equal'
+        HAS_ERROR_EQUAL: 'Has error is equal',
+        ORDER_ID_EQUAL: 'Order id is equal'
     },
     SETTINGS: {
         NAME: 'AssertionError',
@@ -101,6 +103,50 @@ const ERRORS = {
             actionCodeDescription: 'Request processed successfully',
             error: false
         }
+    },
+    FREEZE_SUCCESS: {
+        hasError: false,
+        data: {
+            errorCode: '0',
+            errorMessage: 'Success',
+            orderStatus: 1,
+            error: false,
+        }
+    },
+    FREEZE_AMOUNT_INVALID: {
+        hasError: true,
+        data: {
+          errorCode: 5,
+          errorMessage: 'Amount is invalid',
+          errorCodeString: '5',
+          error: true
+        },
+        errorStep: 'registerPreAuth.do'
+    },
+    FREEZE_ORDER_NUMBER: {
+        hasError: true,
+        data: {
+          errorCode: 1,
+          errorMessage: 'Order number is duplicated, order with given order number is processed already',
+          errorCodeString: '1',
+          error: true
+        },
+        errorStep: 'registerPreAuth.do'
+    },
+    FREEZE_LANGUAGE: {
+        hasError: true,
+        data: {
+          errorCode: 5,
+          errorMessage: 'Invalid merchant language',
+          errorCodeString: '5',
+          error: true
+        },
+        errorStep: 'registerPreAuth.do'
+    },
+    FREEZE_NO_BINDING_FOUND: {
+        hasError: true,
+        data: { error: 'No binding found', errorCode: 2 },
+        errorStep: 'paymentOrderBinding.do'
     }
 }
 
