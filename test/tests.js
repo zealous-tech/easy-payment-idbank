@@ -1,30 +1,42 @@
-const CONSTANTS = require('./constants/constants')
+const CONSTANTS = require('./constants/constants');
 
-const attachCardTest = (Gateways,IDBANK,tap,makeId) => {
+const makeId = (length) => {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let index = 0; index < length; ++index) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+};
+
+const settings = {
+    USER_NAME_API: '14531661_api',
+    PASSWORD_API: 'ker1Vanadzor1pak',
+    USER_NAME_API_BINDING: '14531661_binding',
+    PASSWORD_API_BINDING: 'ker1Vanadzor1pak',
+    TEST_MODE: false
+};
+
+const clientId = 'DNEDSThkJ2G9FxfH9';
+const bindingId = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
+const bindingId2 = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
+
+const defaultOrder = {
+    orderNumber: `tl${makeId(10)}`,
+    currency: '051',
+    language: 'hy',
+    pageView: 'DESKTOP',
+    amount: 100,
+    returnUrl: 'http://localhost:4000/api/card/paymentResult',
+    description: 'Kerpak - TEST LOCAL',
+    clientId: clientId,                                                                                                                                                                                                                           
+    bindingId: bindingId,
+    useBinding: true,
+}
+
+const attachCardTest = (Gateways,IDBANK,tap) => {
     tap.test(CONSTANTS.TEST_NAMES.ATTACH_CARD, async (tap) => {
-        const settings = {
-            USER_NAME_API: '14531737_api',
-            PASSWORD_API: 'ker1Vanadzor1pak1',
-            USER_NAME_API_BINDING: '14531737_binding',
-            PASSWORD_API_BINDING: 'ker1Vanadzor1pak1',
-            TEST_MODE: false
-        };
-
-        const clientId = 'DNEDSThkJ2G9FxfH9';
-        const bindingId = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
-        const bindingId2 = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
-    
-        const defaultOrder = {
-            orderNumber: `tl${makeId(10)}`,
-            currency: '051',
-            language: 'hy',
-            pageView: 'DESKTOP',
-            amount: 100,
-            returnUrl: 'http://localhost:4000/api/card/paymentResult',
-            description: 'Kerpak - TEST LOCAL',
-            clientId: clientId,
-        }
-    
         tap.test(CONSTANTS.TEST_NAMES.SETTINGS_FIELDS, async (tap) => {
             const newSettings = {...settings};
             delete newSettings.PASSWORD_API;
@@ -53,11 +65,11 @@ const attachCardTest = (Gateways,IDBANK,tap,makeId) => {
         tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
-            order.amount = null;
+            delete order.amount;
             const res = await client.attachCard(order);
     
             tap.plan(1);
-            tap.strictSame(res, CONSTANTS.AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.strictSame(res, CONSTANTS.AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
             tap.end();
         });
     
@@ -100,33 +112,8 @@ const attachCardTest = (Gateways,IDBANK,tap,makeId) => {
     });
 }
 
-const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
+const payOrderTest = async (Gateways,IDBANK,tap) => {
     tap.test(CONSTANTS.TEST_NAMES.PAY_ORDER, async (tap) => {
-        const settings = {
-            USER_NAME_API: '14531661_api',
-            PASSWORD_API: 'ker1Vanadzor1pak',
-            USER_NAME_API_BINDING: '14531661_binding',
-            PASSWORD_API_BINDING: 'ker1Vanadzor1pak',
-            TEST_MODE: false
-        };
-
-        const clientId = 'DNEDSThkJ2G9FxfH9';
-        const bindingId = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
-        const bindingId2 = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
-    
-        const defaultOrder = {
-            orderNumber: `tl${makeId(10)}`,
-            currency: '051',
-            language: 'hy',
-            pageView: 'DESKTOP',
-            amount: 100,
-            returnUrl: 'http://localhost:4000/api/card/paymentResult',
-            description: 'Kerpak - TEST LOCAL',
-            clientId: clientId,                                                                                                                                                                                                                           
-            bindingId: bindingId,
-            useBinding: true,
-        }
-    
         tap.test(CONSTANTS.TEST_NAMES.SETTINGS_FIELDS, async (tap) => {
             const newSettings = {...settings};
             delete newSettings.USER_NAME_API;
@@ -157,11 +144,11 @@ const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
             order.orderNumber = `tl${makeId(10)}`;
-            order.amount = null;
+            delete order.amount;
             const res = await client.payOrder(order);
     
             tap.plan(1);
-            tap.strictSame(res, CONSTANTS.AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY)
+            tap.strictSame(res, CONSTANTS.AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
             tap.end();
         });
     
@@ -217,8 +204,10 @@ const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
         tap.test(CONSTANTS.TEST_NAMES.SUCCESS,async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
             const {hasError,data} = await client.payOrder(order);
-            const res = { hasError,
+            const res = {
+                hasError,
                 data
             }
 
@@ -245,4 +234,48 @@ const payOrderTest = async (Gateways,IDBANK,tap,makeId) => {
     });
 }
 
-module.exports = { attachCardTest, payOrderTest };
+const getOrderStatusTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.GET_ORDER_STATUS, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const res = await client.getOrderStatus({
+                useBinding: true,
+                extended: true,
+            });
+
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.GET_ORDER_STATUS_NOT_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const resOrder = await client.payOrder(order);            
+            const orderId = resOrder.register.orderId;
+            const res = await client.getOrderStatus({
+                orderId: orderId,
+                useBinding: true,
+                extended: true,
+            });
+
+            const comparableOrder = {
+                hasError: CONSTANTS.GET_ORDER_STATUS_SUCCESS.hasError,
+                data: {
+                    ...res.data,
+                    ...CONSTANTS.GET_ORDER_STATUS_SUCCESS.data,
+                    orderNumber: order.orderNumber,
+                    amount:  order.amount,
+                    currency:  order.currency,
+                },
+            }
+            
+            tap.plan(1);
+            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+    });
+}
+
+module.exports = { attachCardTest, payOrderTest, getOrderStatusTest };

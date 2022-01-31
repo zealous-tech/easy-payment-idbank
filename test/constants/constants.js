@@ -5,11 +5,13 @@ const ERRORS = {
         TIMEOUT: 'Testing timeout',
         AMOUNT: 'Testing without amount',
         ORDER_NUMBER: 'Testing without order number',
+        ORDER_ID: 'Testing without order id',
         LANGUAGE: 'Testing without language',
         SUCCESS: 'Success',
         PAY_ORDER: 'Pay order',
         CLIENT_ID: 'Testing without clientId',
-        BINDING_ID: 'Testing without bindingId'
+        BINDING_ID: 'Testing without bindingId',
+        GET_ORDER_STATUS: 'Get order status',
     },
     MESSAGES: {
         EQUIVALENT_STRICTLY: 'The response a equivalent strictly',
@@ -79,6 +81,27 @@ const ERRORS = {
         data: { error: 'No binding found', errorCode: 2 },
         errorStep: 'paymentOrderBinding.do'
     },
+    GET_ORDER_STATUS_NOT_FOUND: {
+        hasError: false,
+        data: {
+          errorCode: '6',
+          errorMessage: 'Order not found',
+          merchantOrderParams: [],
+          attributes: [],
+          error: true
+        }
+    },
+    GET_ORDER_STATUS_SUCCESS: {
+        hasError: false,
+        data: {
+            errorCode: '0',
+            errorMessage: 'Success',
+            orderStatus: 2,
+            actionCode: 0,
+            actionCodeDescription: 'Request processed successfully',
+            error: false
+        }
+    }
 }
 
 module.exports = ERRORS
