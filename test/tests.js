@@ -382,4 +382,135 @@ const freezeTest = async (Gateways,IDBANK,tap) => {
     });
 }
 
-module.exports = { attachCardTest, payOrderTest, getOrderStatusTest, freezeTest };
+const reverseOrderTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.REVERSE, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const orderId = `tl${makeId(10)}`;
+            const res = await client.reverseOrderProfile({ orderId });
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.REVERSE_ORDER_NO_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const resFreeze = await client.freezeOrder(order);
+            const orderId = resFreeze.registerPreAuth.orderId;
+            const res = await client.reverseOrderProfile({
+                orderId,
+                currency: resFreeze.data.currency,
+                language: order.language,
+            });
+
+            const comparableOrder = {
+                ...CONSTANTS.REVERSE_SUCCESS,
+                data: {
+                    ...res.data,
+                    ...CONSTANTS.REVERSE_SUCCESS.data,
+                    orderNumber: order.orderNumber,
+                    amount:  order.amount,
+                    currency:  order.currency,
+                    clientId:  order.clientId,
+                    bindingId:  order.bindingId,
+                },
+            }
+            
+            tap.plan(2);
+            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.test(CONSTANTS.TEST_NAMES.SAME_ORDER_ID, async (tap) => {
+                const res = await client.reverseOrderProfile({
+                    orderId,
+                    currency: resFreeze.data.currency,
+                    language: order.language,
+                });
+
+                tap.plan(1);
+                tap.strictSame(res, CONSTANTS.REVERSE_SAME_ORDER_ID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            });
+            tap.end();
+        });
+    });
+}
+
+const depositOrderTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.REVERSE, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const orderId = `tl${makeId(10)}`;
+            const res = await client.depositOrder({ orderId });
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.DEPOSIT_ORDER_NO_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const resFreeze = await client.freezeOrder(order);
+            const orderId = resFreeze.registerPreAuth.orderId;
+            const resExceeding = await client.depositOrder({
+                orderId,
+                currency: resFreeze.data.currency,
+                language: order.language,
+                amount: order.amount + 100
+            });
+            const res = await client.depositOrder({
+                orderId,
+                currency: resFreeze.data.currency,
+                language: order.language,
+            });
+
+            tap.plan(2);
+            tap.strictSame(resExceeding, CONSTANTS.DEPOSIT_AMOUNT_EXCEEDING, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.strictSame(res, CONSTANTS.DEPOSIT_AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const resFreeze = await client.freezeOrder(order);
+            const orderId = resFreeze.registerPreAuth.orderId;
+            const res = await client.depositOrder({
+                orderId,
+                currency: resFreeze.data.currency,
+                language: order.language,
+                amount: order.amount
+            });
+            const comparableOrder = {
+                ...CONSTANTS.DEPOSIT_SUCCESS,
+                data: {
+                    ...res.data,
+                    ...CONSTANTS.DEPOSIT_SUCCESS.data,
+                    orderNumber: order.orderNumber,
+                    amount:  order.amount,
+                    currency:  order.currency,
+                    clientId:  order.clientId,
+                    bindingId:  order.bindingId,
+                },
+            }
+
+            tap.plan(2);
+            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.test(CONSTANTS.TEST_NAMES.SAME_ORDER_ID, async (tap) => {
+                const res = await client.depositOrder({
+                    orderId,
+                    currency: resFreeze.data.currency,
+                    language: order.language,
+                    amount: order.amount
+                });
+                
+                tap.plan(1);
+                tap.strictSame(res, CONSTANTS.DEPOSIT_SAME_ORDER_ID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            });
+            tap.end();
+        });
+    });
+}
+
+module.exports = { attachCardTest, payOrderTest, getOrderStatusTest, freezeTest, reverseOrderTest, depositOrderTest };

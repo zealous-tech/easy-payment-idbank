@@ -6,13 +6,15 @@ const ERRORS = {
         AMOUNT: 'Testing without amount',
         ORDER_NUMBER: 'Testing without order number',
         ORDER_ID: 'Testing without order id',
+        SAME_ORDER_ID: 'Testing with the same order id',
         LANGUAGE: 'Testing without language',
         SUCCESS: 'Success',
         PAY_ORDER: 'Pay order',
         CLIENT_ID: 'Testing without clientId',
         BINDING_ID: 'Testing without bindingId',
         GET_ORDER_STATUS: 'Get order status',
-        FREEZE: 'Freeze'
+        FREEZE: 'Freeze order',
+        REVERSE: 'Reverse order',
     },
     MESSAGES: {
         EQUIVALENT_STRICTLY: 'The response a equivalent strictly',
@@ -147,7 +149,73 @@ const ERRORS = {
         hasError: true,
         data: { error: 'No binding found', errorCode: 2 },
         errorStep: 'paymentOrderBinding.do'
-    }
+    },
+    REVERSE_SUCCESS: {
+        reverse: { errorCode: '0', errorMessage: 'Success', error: false },
+        hasError: false,
+        data: {
+          errorCode: '0',
+          errorMessage: 'Success',
+          orderStatus: 3,
+          error: false
+        }
+    },
+    REVERSE_ORDER_NO_FOUND: {
+        hasError: true,
+        data: { errorCode: '6', errorMessage: 'No such order', error: true },
+        errorStep: 'reverse.do'
+    },
+    REVERSE_SAME_ORDER_ID: {
+        hasError: true,
+        data: {
+          errorCode: '7',
+          errorMessage: 'Reversal is impossible for current transaction state',
+          error: true
+        },
+        errorStep: 'reverse.do'
+    },
+    DEPOSIT_SUCCESS: {
+        deposit: { errorCode: '0', errorMessage: 'Success', error: false },
+        hasError: false,
+        data: {
+          errorCode: '0',
+          errorMessage: 'Success',
+          orderStatus: 2,
+          error: false
+        }
+    },
+    DEPOSIT_ORDER_NO_FOUND: {
+        hasError: true,
+        data: { errorCode: '6', errorMessage: 'No such order', error: true },
+        errorStep: 'deposit.do'
+    },
+    DEPOSIT_AMOUNT_INVALID: {
+        hasError: true,
+        data: {
+          errorCode: '5',
+          errorMessage: 'deposit amount is invalid',
+          error: true
+        },
+        errorStep: 'deposit.do'
+    },
+    DEPOSIT_AMOUNT_EXCEEDING: {
+        hasError: true,
+        data: {
+          errorCode: '5',
+          errorMessage: 'deposited amount is exceeding approved amount',
+          error: true
+        },
+        errorStep: 'deposit.do'
+    },
+    DEPOSIT_SAME_ORDER_ID: {
+        hasError: true,
+        data: {
+          errorCode: '7',
+          errorMessage: 'Payment must be in approved state',
+          error: true
+        },
+        errorStep: 'deposit.do'
+    },
 }
 
 module.exports = ERRORS
