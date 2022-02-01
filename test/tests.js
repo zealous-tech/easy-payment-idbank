@@ -10,6 +10,14 @@ const makeId = (length) => {
     return result;
 };
 
+const settingsKerpak = {
+    USER_NAME_API: '14531737_api',
+    PASSWORD_API: 'ker1Vanadzor1pak1',
+    USER_NAME_API_BINDING: '14531737_binding',
+    PASSWORD_API_BINDING: 'ker1Vanadzor1pak1',
+    TEST_MODE: false
+};
+
 const settings = {
     USER_NAME_API: '14531661_api',
     PASSWORD_API: 'ker1Vanadzor1pak',
@@ -18,9 +26,8 @@ const settings = {
     TEST_MODE: false
 };
 
-const clientId = 'DNEDSThkJ2G9FxfH9';
-const bindingId = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
-const bindingId2 = 'a5c68f48-4d51-4f7a-9c32-0d6a432bce27';
+const clientId = '9xdj1WoyabyjdglaQ';
+const bindingId = 'da5e9648-c417-4c9c-b8a4-d3784df2519d';
 
 const defaultOrder = {
     orderNumber: `tl${makeId(10)}`,
@@ -38,7 +45,7 @@ const defaultOrder = {
 const attachCardTest = (Gateways,IDBANK,tap) => {
     tap.test(CONSTANTS.TEST_NAMES.ATTACH_CARD, async (tap) => {
         tap.test(CONSTANTS.TEST_NAMES.SETTINGS_FIELDS, async (tap) => {
-            const newSettings = {...settings};
+            const newSettings = {...settingsKerpak};
             delete newSettings.PASSWORD_API;
             try {
                 Gateways.create(IDBANK, newSettings);
@@ -51,7 +58,7 @@ const attachCardTest = (Gateways,IDBANK,tap) => {
         });
     
         tap.test(CONSTANTS.TEST_NAMES.TIMEOUT, async (tap) => {
-            const newSettings = {...settings, TIMEOUT: 10};
+            const newSettings = {...settingsKerpak, TIMEOUT: 10};
             const client = Gateways.create(IDBANK, newSettings);
             const order = { ...defaultOrder };
             const res = await client.attachCard(order);
@@ -63,7 +70,7 @@ const attachCardTest = (Gateways,IDBANK,tap) => {
         });
     
         tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
-            const client = Gateways.create(IDBANK, settings);
+            const client = Gateways.create(IDBANK, settingsKerpak);
             const order = { ...defaultOrder };
             delete order.amount;
             const res = await client.attachCard(order);
@@ -74,7 +81,7 @@ const attachCardTest = (Gateways,IDBANK,tap) => {
         });
     
         tap.test(CONSTANTS.TEST_NAMES.ORDER_NUMBER, async (tap) => {
-            const client = Gateways.create(IDBANK, settings);
+            const client = Gateways.create(IDBANK, settingsKerpak);
             const order = { ...defaultOrder };
             order.orderNumber = null;
             const res = await client.attachCard(order);
@@ -85,7 +92,7 @@ const attachCardTest = (Gateways,IDBANK,tap) => {
         });
     
         tap.test(CONSTANTS.TEST_NAMES.LANGUAGE, async (tap) => {
-            const client = Gateways.create(IDBANK, settings);
+            const client = Gateways.create(IDBANK, settingsKerpak);
             const order = { ...defaultOrder };
             order.language = null;
             const res = await client.attachCard(order);
@@ -96,7 +103,7 @@ const attachCardTest = (Gateways,IDBANK,tap) => {
         });
 
         tap.test(CONSTANTS.TEST_NAMES.SUCCESS,async (tap) => {
-            const client = Gateways.create(IDBANK, settings);
+            const client = Gateways.create(IDBANK, settingsKerpak);
             const order = { ...defaultOrder };
             const res = await client.attachCard(order);
     
@@ -436,7 +443,7 @@ const reverseOrderTest = async (Gateways,IDBANK,tap) => {
 }
 
 const depositOrderTest = async (Gateways,IDBANK,tap) => {
-    tap.test(CONSTANTS.TEST_NAMES.REVERSE, async (tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.DEPOSIT, async (tap) => {
         tap.test(CONSTANTS.TEST_NAMES.ORDER_ID, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
             const orderId = `tl${makeId(10)}`;
@@ -513,4 +520,137 @@ const depositOrderTest = async (Gateways,IDBANK,tap) => {
     });
 }
 
-module.exports = { attachCardTest, payOrderTest, getOrderStatusTest, freezeTest, reverseOrderTest, depositOrderTest };
+const refundOrderTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.REFUND, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.ORDER_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const orderId = `tl${makeId(10)}`;
+            const res = await client.refundOrder({ orderId });
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.REFUND_ORDER_NO_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.AMOUNT, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const resPay = await client.payOrder(order);
+            const orderId = resPay.register.orderId;
+            const resExceeding = await client.refundOrder({
+                orderId,
+                currency: resPay.data.currency,
+                language: order.language,
+                amount: order.amount + 100
+            });
+            const res = await client.refundOrder({
+                orderId,
+                currency: resPay.data.currency,
+                language: order.language,
+            });
+
+            tap.plan(2);
+            tap.strictSame(resExceeding, CONSTANTS.REFUND_AMOUNT_EXCEEDING, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.strictSame(res, CONSTANTS.REFUND_AMOUNT_INVALID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const order = { ...defaultOrder };
+            order.orderNumber = `tl${makeId(10)}`;
+            const resPay = await client.payOrder(order);
+            const orderId = resPay.register.orderId;
+            const res = await client.refundOrder({
+                orderId,
+                currency: resPay.data.currency,
+                language: order.language,
+                amount: order.amount
+            });
+
+            const comparableOrder = {
+                ...CONSTANTS.REFUND_SUCCESS,
+                data: {
+                    ...res.data,
+                    ...CONSTANTS.REFUND_SUCCESS.data,
+                    orderNumber: order.orderNumber,
+                    amount:  order.amount,
+                    currency:  order.currency,
+                    clientId:  order.clientId,
+                    bindingId:  order.bindingId,
+                },
+            }
+
+            tap.plan(2);
+            tap.strictSame(res, comparableOrder, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.test(CONSTANTS.TEST_NAMES.SAME_ORDER_ID, async (tap) => {
+                const res = await client.refundOrder({
+                    orderId,
+                    currency: resPay.data.currency,
+                    language: order.language,
+                    amount: order.amount
+                });
+                tap.plan(1);
+                tap.strictSame(res, CONSTANTS.REFUND_SAME_ORDER_ID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            });
+            tap.end();
+        });
+    });
+}
+
+const getBindingsTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.GET_BINDINGS, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.CLIENT_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const clientId = `tl${makeId(10)}`;
+            const res = await client.getBindings(clientId);
+
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.BINDING_NOT_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settings);
+            const res = await client.getBindings(clientId);
+            const bindings = res.data.bindings;
+            delete res.data.bindings;
+
+            tap.plan(2);
+            tap.strictSame(res, CONSTANTS.BINDING_SUCCESS, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.type(bindings, 'Array', CONSTANTS.MESSAGES.TYPE_EQUAL);
+            tap.end();
+        });
+    });
+}
+
+const removeCardTest = async (Gateways,IDBANK,tap) => {
+    tap.test(CONSTANTS.TEST_NAMES.REMOVE_CARD, async (tap) => {
+        tap.test(CONSTANTS.TEST_NAMES.BINDING_ID, async (tap) => {
+            const client = Gateways.create(IDBANK, settingsKerpak);
+            const bindingId = `tl${makeId(10)}`;
+            const res = await client.removeCard(bindingId);
+
+            tap.plan(1);
+            tap.strictSame(res, CONSTANTS.REMOVE_CARD_BINDING_NOT_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.end();
+        });
+
+        tap.test(CONSTANTS.TEST_NAMES.SUCCESS, async (tap) => {
+            const client = Gateways.create(IDBANK, settingsKerpak);
+            const res = await client.removeCard(bindingId);
+            delete res.data.bindings;
+            
+            tap.plan(2);
+            tap.strictSame(res, CONSTANTS.REMOVE_CARD_SUCCESS, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            tap.test(CONSTANTS.TEST_NAMES.SAME_BINDING_ID, async (tap) => {
+                const res = await client.removeCard(bindingId);
+                tap.plan(1);
+                tap.strictSame(res, CONSTANTS.REMOVE_CARD_SAME_BINDING_ID, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);
+            });
+            tap.end();
+        });
+    });
+}
+
+module.exports = { attachCardTest, payOrderTest, getOrderStatusTest, freezeTest, reverseOrderTest, depositOrderTest, refundOrderTest, getBindingsTest, removeCardTest };

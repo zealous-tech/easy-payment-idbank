@@ -7,6 +7,7 @@ const ERRORS = {
         ORDER_NUMBER: 'Testing without order number',
         ORDER_ID: 'Testing without order id',
         SAME_ORDER_ID: 'Testing with the same order id',
+        SAME_BINDING_ID: 'Testing with the same binding id',
         LANGUAGE: 'Testing without language',
         SUCCESS: 'Success',
         PAY_ORDER: 'Pay order',
@@ -15,6 +16,10 @@ const ERRORS = {
         GET_ORDER_STATUS: 'Get order status',
         FREEZE: 'Freeze order',
         REVERSE: 'Reverse order',
+        DEPOSIT: 'Deposit order',
+        REFUND: 'Refund order',
+        GET_BINDINGS: 'Get bindings',
+        REMOVE_CARD: 'Remove card'
     },
     MESSAGES: {
         EQUIVALENT_STRICTLY: 'The response a equivalent strictly',
@@ -23,7 +28,8 @@ const ERRORS = {
         ERROR_CODE_EQUAL: 'Error code is equal',
         ERROR_EQUAL: 'Error is equal',
         HAS_ERROR_EQUAL: 'Has error is equal',
-        ORDER_ID_EQUAL: 'Order id is equal'
+        ORDER_ID_EQUAL: 'Order id is equal',
+        TYPE_EQUAL: 'Type is equal'
     },
     SETTINGS: {
         NAME: 'AssertionError',
@@ -216,6 +222,96 @@ const ERRORS = {
         },
         errorStep: 'deposit.do'
     },
+    REFUND_ORDER_NO_FOUND: {
+        hasError: true,
+        data: {
+            errorCode: '6',
+            errorMessage: 'No such order',
+            error: true
+        },
+        errorStep: 'refund.do'
+    },
+    REFUND_SUCCESS: {
+        refund: { errorCode: '0', errorMessage: 'Success', error: false },
+        hasError: false,
+        data: {
+          errorCode: '0',
+          errorMessage: 'Success',
+          orderStatus: 4,
+          error: false
+        }
+    },
+    REFUND_AMOUNT_INVALID: {
+        hasError: true,
+        data: { 
+            errorCode: '5',
+            errorMessage: 'Amount is invalid',
+            error: true 
+        },
+        errorStep: 'refund.do'
+    },
+    REFUND_AMOUNT_EXCEEDING: {
+        hasError: true,
+        data: {
+          errorCode: '7',
+          errorMessage: 'Refund amount exceeds deposited amount',
+          error: true
+        },
+        errorStep: 'refund.do'
+    },
+    REFUND_SAME_ORDER_ID: {
+        hasError: true,
+        data: {
+          errorCode: '7',
+          errorMessage: 'Refund is impossible for current transaction state',
+          error: true
+        },
+        errorStep: 'refund.do'
+    },
+    BINDING_SUCCESS: {
+        hasError: false,
+        data: {
+          errorCode: '0',
+          errorMessage: 'Success',
+          error: false
+        }
+    },
+    BINDING_NOT_FOUND: {
+        hasError: true,
+        data: {
+          errorCode: '2',
+          errorMessage: 'Data not found',
+          bindings: [],
+          error: true
+        },
+        errorStep: 'getBindings.do'
+    },
+    REMOVE_CARD_SUCCESS: {
+        hasError: false,
+        data: {
+            errorCode: '0',
+            errorMessage: 'Success',
+            error: false
+        }
+    },
+    REMOVE_CARD_BINDING_NOT_FOUND: {
+        hasError: true,
+        data: {
+            errorCode: '2',
+            errorMessage: 'No binding found',
+            error: true
+        },
+        errorStep: 'unBindCard.do'
+    },
+    REMOVE_CARD_SAME_BINDING_ID: {
+        hasError: true,
+        data: {
+          errorCode: '2',
+          errorMessage: "Binding is already enable/disable, change doesn't need",
+          error: true
+        },
+        errorStep: 'unBindCard.do'
+    }
 }
 
 module.exports = ERRORS
