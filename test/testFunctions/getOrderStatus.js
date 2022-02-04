@@ -53,10 +53,9 @@ module.exports = (Gateways, IDBANK, tap, makeId, defaultOrder) => {
 
         tap.test(CONSTANTS.TEST_NAMES.ORDER_ID, async (tap) => {
             const client = Gateways.create(IDBANK, settings);
-            const res = await client.getOrderStatus({
-                useBinding: true,
-                extended: true,
-            });
+            const res = await client.getOrderStatus({ useBinding: true, extended: true });
+            delete res.data.merchantOrderParams;
+            delete res.data.attributes;
 
             tap.plan(1);
             tap.strictSame(res, CONSTANTS.GET_ORDER_STATUS_NOT_FOUND, CONSTANTS.MESSAGES.EQUIVALENT_STRICTLY);

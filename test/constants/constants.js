@@ -152,8 +152,6 @@ module.exports = {
         data: {
           errorCode: '6',
           errorMessage: 'Order not found',
-          merchantOrderParams: [],
-          attributes: [],
           error: true
         }
     },

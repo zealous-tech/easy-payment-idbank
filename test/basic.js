@@ -25,7 +25,7 @@ const makeId = (length) => {
 };
 
 const clientId = 'DNEDSThkJ2G9FxfH9';
-const bindingId = 'bed5aad0-e220-4321-ab8c-d068a74ac0ff';
+const bindingId = 'db8f2f8a-c886-4221-9f6d-e5b2dbf47fb4';
 
 const defaultOrder = {
     orderNumber: `tl${makeId(10)}`,
