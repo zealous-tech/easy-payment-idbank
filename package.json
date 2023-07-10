@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "exit 0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/InstigateMobile/easy-payment-idbank"
+    "url": "https://github.com/zealous-tech/easy-payment-idbank"
   },
   "keywords": [
     "payment",
@@ -16,10 +17,10 @@
     "easy-payment",
     "idbank"
   ],
-  "author": "Instigate Mobile CJCS",
+  "author": "zealous",
   "license": "MIT",
   "dependencies": {
-    "@easy-payment/base": "git+https://git@github.com/InstigateMobile/easy-payment-base.git",
-    "got": "^11.8.3"
+    "@easy-payment/base": "git+https://git@github.com:zealous-tech/easy-payment-base.git",
+    "got": "^13.0.0"
   }
 }

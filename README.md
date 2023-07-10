@@ -25,5 +25,5 @@ const client = Gateways.create(IDBANK, settings);
 
 ## Gateway API
 
-This is an adaptor of IDBANK APIs for [easy-payment](https://github.com/InstigateMobile/easy-payment-main).
-It implements the [BaseGateway](https://github.com/InstigateMobile/easy-payment-base) API.
+This is an adaptor of IDBANK APIs for [easy-payment](https://github.com/zealous-tech/easy-payment-main).
+It implements the [BaseGateway](https://github.com/zealous-tech/easy-payment-base) API.
