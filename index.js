@@ -1,7 +1,7 @@
-const IDBANK = require('./lib/idbank.js');
-const assert = require('assert');
+import IDBANK from './lib/idbank.js';
+import assert from 'assert';
 
-module.exports = {
+export default  {
   gateway: function (options) {
     assert(options.USER_NAME_API, 'USER_NAME_API is mandatory');
     assert(options.PASSWORD_API, 'PASSWORD_API is mandatory');
